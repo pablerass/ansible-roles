@@ -1,0 +1,28 @@
+- name: Generate needed locales
+  locale_gen:
+        name=es_ES.UTF-8
+        state=present
+
+- name: Install PostgreSQL packages
+  apt: name=postgresql
+       state=present
+
+- name: Install other PostgreSQL needed packages
+  apt: name={{ item }}
+       state=present
+  with_items:
+    - python-psycopg2
+    - libpq-dev
+
+- name: Configure default user authentication
+  lineinfile:
+        backup=yes
+        dest=/etc/postgresql/9.3/main/pg_hba.conf
+        insertbefore='^local\s+all\s+all\s+peer\s*$'
+        line='local all bdtfuser md5'
+  notify:
+    - reload postgres
+
+# If locals are not properly configured, the following must be run
+# sudo locale-gen es_ES.UTF-8
+# sudo pg_createcluster 9.3 main --start

@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: bleras
+  description:
+  license: license CC-BY
+  min_ansible_version: 1.2
+  platforms:
+    - name: Ubuntu
+      versions:
+      - trusty
+  categories:
+    - database:sql
+dependencies:
+  - { role: postgres }
