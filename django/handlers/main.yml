@@ -1,0 +1,11 @@
+---
+# handlers file for django
+- name: reload supervisor
+  supervisorctl:
+        name={{ django_app_name }}
+        state=restarted
+
+- name: reload nginx
+  service:
+        name=nginx
+        state=reloaded

@@ -1,0 +1,88 @@
+---
+# tasks file for django
+- name: "Create {{ django_group }} user"
+  user: name={{ django_group }}
+
+- name: "Create {{ django_user }} user"
+  user: name={{ django_user }}
+        shell=/bin/bash
+        createhome=no
+        home={{ django_app_dir }}
+        group={{ django_group }}
+
+- name: "Create {{ django_app_name }} dirs"
+  file: name={{ item }}
+        state=directory
+        owner={{ django_user }}
+        group={{ django_group }}
+        mode=g+s
+  with_items:
+    - "{{ django_base_dir }}"
+    - "{{ django_static_dir }}"
+    - "{{ django_log_dir }}"
+    - "{{ django_bin_dir }}"
+    - "{{ django_run_dir }}"
+    - "{{ django_media_dir }}"
+
+- name: "Update APT cache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+
+- name: "Install needed packages"
+  apt:  name={{ item }}
+  with_items:
+    - python-pip
+    - python-virtualenv
+    - python-dev
+    - supervisor
+    - nginx
+
+- name: "Install needed Pip packages in {{ django_base_dir }} virtualenv"
+  pip:  name={{ item }}
+        virtualenv={{ django_base_dir }}
+  with_items:
+    - django
+    - gunicorn
+    - setproctitle
+
+# Gunicorn configuration
+- name: "Create gunicorn executable file"
+  template:
+        dest={{ django_gunicorn_script }}
+        src=gunicorn_start.j2
+        owner={{ django_user }}
+        group={{ django_group }}
+        mode=755
+
+- name: "Create {{ django_app_name }} supervisor log file"
+  command: touch {{ django_gunicorn_supervisor_log }}
+  args:
+    creates: "{{ django_gunicorn_supervisor_log }}"
+
+- name: "Create supervisor {{ django_app_name }} configuration"
+  template:
+        dest=/etc/supervisor/conf.d/{{ django_app_name }}.conf
+        src=supervisor.conf.j2
+
+- name: "Start {{ django_app_name }} supervisor"
+  supervisorctl:
+        name={{ django_app_name }}
+        state=started
+
+# Nginx configuration
+- name: "Remove default nginx site"
+  file: path=/etc/nginx/sites-enabled/default
+        state=absent
+  notify: reload nginx
+
+- name: "Add {{ django_app_name }} site"
+  template:
+        src=nginx_site.conf.j2
+        dest=/etc/nginx/sites-available/{{ django_app_name }}.conf
+  notify: reload nginx
+
+- name: "Enable {{ django_app_name }} site"
+  file: src=/etc/nginx/sites-available/{{ django_app_name }}.conf
+        dest=/etc/nginx/sites-enabled/{{ django_app_name }}.conf
+        state=link
+  notify: reload nginx

@@ -41,7 +41,7 @@
   notify:
     - restart postgres
 
-- name: "Configure {{ db_user }} remote authentication from {{ remote_clients }}"
+- name: "Configure {{ db_user }} remote authentication from {{ remote_clients }} hosts"
   lineinfile:
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf

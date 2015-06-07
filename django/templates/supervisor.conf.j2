@@ -1,0 +1,7 @@
+[program:{{ django_app_name }}]
+command = {{ django_gunicorn_script }}                   ; Command to start app
+user = {{ django_user }}                                 ; User to run as
+stdout_logfile = {{ django_gunicorn_supervisor_log }}    ; Where to write log messages
+redirect_stderr = true                                   ; Save stderr in the same log
+environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8          ; Set UTF-8 as default encoding
+

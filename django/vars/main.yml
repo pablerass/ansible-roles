@@ -1,0 +1,21 @@
+---
+# vars file for django
+django_user: "{{ django_app_name }}_django_user"
+django_group: "django"
+django_root: "/srv/{{ django_group }}"
+
+django_base_dir: "{{ django_root }}/{{ django_app_name }}_app"
+
+django_app_dir: "{{ django_base_dir }}/{{ django_app_name }}"
+
+django_static_dir: "{{ django_base_dir }}/static"
+django_log_dir: "{{ django_base_dir }}/log"
+django_bin_dir: "{{ django_base_dir }}/bin"
+django_run_dir: "{{ django_base_dir }}/run"
+django_media_dir: "{{ django_base_dir }}/media"
+
+django_gunicorn_script: "{{ django_bin_dir }}/gunicorn_start"
+django_gunicorn_sock: "{{ django_run_dir }}/gunicorn.sock"
+django_gunicorn_supervisor_log: "{{ django_log_dir }}/gunicorn_supervisor.log"
+
+django_num_workers: 2 \* {{ansible_processor_count}} + 1
