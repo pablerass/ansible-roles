@@ -1,41 +1,41 @@
 ---
-- name: Create {{ db_name }} database
+- name: Create {{ pg_db_name }} database
   sudo_user: postgres
   postgresql_db:
-        name={{ db_name }}
+        name={{ pg_db_name }}
 
-- name: Create {{ db_user }} user for {{ db_name }}
+- name: Create {{ pg_db_user }} user for {{ db_name }}
   sudo_user: postgres
   postgresql_user:
-        db={{ db_name }}
-        name={{ db_user }}
-        password={{ db_pass }}
+        db={{ pg_db_name }}
+        name={{ pg_db_user }}
+        password={{ pg_db_pass }}
         priv=CONNECT
 
-- name: Set default {{ db_user }} privileges
+- name: Set default {{ pg_db_user }} privileges
   sudo_user: postgres
   postgresql_privs:
-        database={{ db_name }}
+        database={{ pg_db_name }}
         state=present
         privs=ALL
         type=database
-        roles={{ db_user }}
+        roles={{ pg_db_user }}
 
-- name: Configure {{ db_user }} local authentication
+- name: Configure {{ pg_db_user }} local authentication
   lineinfile:
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf
         insertbefore='^local\s+all\s+all\s+peer\s*$'
-        regexp='local\s+all\s+{{ db_user }}\s+'
-        line='local all {{ db_user }} md5'
+        regexp='local\s+all\s+{{ pg_db_user }}\s+'
+        line='local all {{ pg_db_user }} md5'
   notify:
     - reload postgres
 
-- name: Configure {{ db_user }} remote authentication from {{ db_remote_client }}
+- name: Configure {{ pg_db_user }} remote authentication from {{ pg_remote_client }}
   lineinfile:
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf
-        line='host all {{ db_user }} {{ db_remote_client }} md5'
-  when: db_remote_client is defined
+        line='host all {{ pg_db_user }} {{ pg_remote_client }} md5'
+  when: pg_remote_client is defined
   notify:
     - reload postgres

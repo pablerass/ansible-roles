@@ -1,12 +1,22 @@
 ---
 # tasks file for postgres
-- name: Update
+- name: Update APT chache
   apt:  update_cache=yes
+        cache_valid_time=3600
 
 - name: Generate needed locales
   locale_gen:
         name={{ pg_locale }}
         state=present
+
+- name: Configure locales as default
+  lineinfile:
+        dest=/etc/default/locale
+        regexp='{{ item.regexp }}'
+        line={{ item.line }}
+  with_items:
+    - { line: "LC_ALL={{ pg_locale }}", regexp: "^LC_ALL=" }
+    - { line: "LANGUAGE={{ pg_locale }}", regexp: "^LANGUAGE=" }
 
 - name: Install PostgreSQL packages
   apt: name=postgresql
@@ -15,13 +25,15 @@
     LC_ALL: "{{ pg_locale }}"
 
 - name: Install other PostgreSQL needed packages
-  apt: name={{ item }}
-       state=present
+  apt:  name={{ item }}
+        state=present
   with_items:
     - python-psycopg2
     - libpq-dev
 
-- name:
-  shell: pg_createcluster 9.3 main --start
-  environment:
-    LC_ALL: "{{ pg_locale }}"
+#- name: Create PostgreSQL database service if failed on installation
+#  command: pg_createcluster 9.3 main --start
+#  environment:
+#    LC_ALL: "{{ pg_locale }}"
+#  args:
+#    creates: /etc/postgresql/9.3/main
