@@ -16,7 +16,7 @@ At this time, only allows md5 Postgres authentication.
 
 ### Optionals
 
-* `db_remote_client`
+* `remote_clients`
 
 ## Dependencies
 
@@ -28,4 +28,4 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: postgresql_db, db_name: db, db_user: dbuser, db_pass: dbpass}
+         - { role: postgresql-db, db_name: db, db_user: dbuser, db_pass: dbpass}
