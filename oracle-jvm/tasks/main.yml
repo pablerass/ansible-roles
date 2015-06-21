@@ -1,0 +1,18 @@
+---
+# tasks file for java-vm
+- name: "Add the webupd8 Apt repository"
+  apt_repository:
+        repo='ppa:webupd8team/java'
+
+- name: "Auto accept Oracle license"
+  command:
+        echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+  changed_when: false
+
+- name: "Install Java Oracle {{ version }} packages"
+  apt:  name=oracle-java{{ version }}-installer
+        state=latest
+
+- name: "Set default Java Oracle {{ version }} packages"
+  apt:  name=oracle-java{{ version }}-set-default
+  when: set_default

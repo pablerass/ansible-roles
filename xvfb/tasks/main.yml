@@ -1,0 +1,28 @@
+---
+# tasks file for xvfb
+- name: "Update APT cache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+  when: ansible_os_family == 'Debian'
+
+- name: "Install Xvfb package"
+  apt:  name=xvfb
+        state=installed
+  when: ansible_os_family == 'Debian'
+
+- name: "Create Xvfb deamon script"
+  template:
+        src=xvfb.j2
+        dest=/etc/init.d/xvfb
+        mode=755
+
+- name: "Configure Xvfb automatic startup"
+  service:
+        name=xvfb
+        enabled=yes
+        state=started
+
+- name: "Configure display environment variable"
+  template:
+        src=profile-xvfb.sh.j2
+        dest=/etc/profile.d/xvfb.sh

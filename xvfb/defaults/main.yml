@@ -1,0 +1,3 @@
+---
+# defaults file for xvfb
+xvfb_display: 0

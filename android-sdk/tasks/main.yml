@@ -1,0 +1,101 @@
+---
+# tasks file for android-sdk
+
+# Install and update Android SDK
+- name: "Download Android SDK"
+  get_url:
+        url={{ android_sdk_url }}
+        dest={{ base_dir }}
+  register: sdk_downloaded
+
+- name: "Unpack Android SDK"
+  unarchive:
+        src={{ base_dir }}/{{ android_sdk_zip }}
+        dest={{ base_dir }}
+        owner=root
+        group=root
+        copy=no
+  when: sdk_downloaded.changed
+
+- name: "Add Android SDK binary dirs to system path"
+  template:
+        src=android-sdk-profile.sh.j2
+        dest={{ android_sdk_profile_file }}
+
+# Needed i386 packages
+# TODO: Creates usage is a simplification, the file should be opened to check if
+# a line such as i386 exists. This works when no other architecture has been
+# added.
+- name: Enable i386 packages
+  command:
+        dpkg --add-architecture i386
+  args:
+    creates: /var/lib/dpkg/arch
+  when: ansible_os_family == "Debian" and
+        ansible_machine == "x86_64"
+  register: i386_enabled
+
+- name: "Update APT sources for i386"
+  apt:  update_cache=yes
+  when: i386_enabled.changed
+
+- name: "Install needed ADB, AAPT packages in x86_64 machines"
+  apt: pkg={{ item }}
+  with_items:
+    - 'libc6:i386'
+    - 'libstdc++6:i386'
+    - 'zlib1g:i386'
+  when: ansible_os_family == "Debian" and
+        ansible_machine == "x86_64"
+
+- name: "Install needed Emulator packages in x86_64 machines"
+  apt: pkg={{ item }}
+  with_items:
+    - 'lib32z1'
+    - 'lib32ncurses5'
+    - 'lib32bz2-1.0'
+  when: ansible_os_family == "Debian" and
+        ansible_machine == "x86_64"
+
+# Aceleration for Android emulation
+- name: "Install virtualization packages for Android emulation"
+  apt:  pkg={{ item }}
+  with_items:
+    - 'qemu-kvm'
+    - 'libvirt-bin'
+    - 'bridge-utils'
+    - 'ubuntu-vm-builder'
+  when: ansible_os_family == "Debian" and
+        android_sdk_mode == "emulator"
+
+- name: "Install i386 virtualization packages for Android emulation"
+  apt:  pkg={{ item }}
+  with_items:
+    - 'libsdl1.2debian:i386'
+    - 'libgl1-mesa-dev:i386'
+  when: ansible_os_family == "Debian" and
+        ansible_machine == "x86_64" and
+        android_sdk_mode == "emulator"
+
+- name: "Copy android-sdk-update.sh script"
+  template:
+        src=android-sdk-update.sh.j2
+        dest={{ android_sdk_update_sh }}
+        mode=755
+
+# Android SDK install and update components
+- name: "Instal android-sdk-update.sh needed packages"
+  apt:  pkg=expect
+  when: ansible_os_family == "Debian"
+
+- name: "Update common Android SDK components"
+  shell: '{{ android_sdk_update_sh }} --filter {{ item }} >> {{ android_sdk_home }}/android-sdk-update-{{ item }}.log'
+  with_items: android_tools.all
+
+# TODO: Review if --all is necessary because installs system images every time
+# this task is executed.
+- name: "Update specific Android SDK components"
+  shell: '{{ android_sdk_update_sh }} --all --filter {{ item }} >> {{ android_sdk_home }}/android-sdk-update-{{ item }}.log'
+  with_items: android_tools[android_sdk_mode]
+  when: android_sdk_mode == "emulator" or
+        android_sdk_mode == "compiler"

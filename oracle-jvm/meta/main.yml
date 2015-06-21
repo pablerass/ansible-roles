@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: pablerass
+  description: 
+  - BSD
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  categories:
+  - development
+  - packaging
+  - system
+dependencies: []

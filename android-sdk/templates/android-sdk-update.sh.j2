@@ -1,0 +1,10 @@
+#!/usr/bin/expect
+
+set timeout -1
+
+spawn /opt/android-sdk-linux/tools/android update sdk --no-ui {*}$argv;
+
+expect {
+    "Do you accept the license" { exp_send "y\r"; exp_continue }
+    eof
+}

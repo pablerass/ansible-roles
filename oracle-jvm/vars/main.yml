@@ -1,0 +1,5 @@
+---
+# vars file for java-vm
+version: "8"
+set_default: false
+
