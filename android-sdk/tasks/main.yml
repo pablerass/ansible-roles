@@ -1,6 +1,5 @@
 ---
 # tasks file for android-sdk
-
 # Install and update Android SDK
 - name: "Download Android SDK"
   get_url:
@@ -8,6 +7,8 @@
         dest={{ base_dir }}
   register: sdk_downloaded
 
+# TODO: Still needed to change privileges to allow all users to execute it. It
+# is enabled directly when tools and platform-tools are updated.
 - name: "Unpack Android SDK"
   unarchive:
         src={{ base_dir }}/{{ android_sdk_zip }}
@@ -17,7 +18,7 @@
         copy=no
   when: sdk_downloaded.changed
 
-- name: "Add Android SDK binary dirs to system path"
+- name: "Add Android SDK to environment variables"
   template:
         src=android-sdk-profile.sh.j2
         dest={{ android_sdk_profile_file }}
@@ -35,9 +36,11 @@
         ansible_machine == "x86_64"
   register: i386_enabled
 
+# TODO: Modify this to avoid executing when the following step is not executed.
+# This sollution solution does not work.
 - name: "Update APT sources for i386"
   apt:  update_cache=yes
-  when: i386_enabled.changed
+  #when: i386_enabled.changed
 
 - name: "Install needed ADB, AAPT packages in x86_64 machines"
   apt: pkg={{ item }}
@@ -55,7 +58,8 @@
     - 'lib32ncurses5'
     - 'lib32bz2-1.0'
   when: ansible_os_family == "Debian" and
-        ansible_machine == "x86_64"
+        ansible_machine == "x86_64" and
+        android_sdk_mode == "emulator"
 
 # Aceleration for Android emulation
 - name: "Install virtualization packages for Android emulation"
@@ -99,3 +103,4 @@
   with_items: android_tools[android_sdk_mode]
   when: android_sdk_mode == "emulator" or
         android_sdk_mode == "compiler"
+

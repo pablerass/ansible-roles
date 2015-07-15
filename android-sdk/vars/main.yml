@@ -25,6 +25,10 @@ android_tools:
   emulator:
     #- 'sys-img-{{ arch }}-android-{{ ver }}
     - 'sys-img-x86-android-22'
+    - 'sys-img-x86-addon-google_apis-google-22'
     - 'sys-img-x86_64-android-22'
+    - 'sys-img-x86_64-addon-google_apis-google-22'
     - 'sys-img-armeabi-v7a-android-22'
-
+    - 'sys-img-armeabi-v7a-addon-google_apis-google-22'
+    # Build tools are required for aapt
+    - 'build-tools-22.0.1'
