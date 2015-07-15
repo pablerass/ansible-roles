@@ -12,17 +12,19 @@
 
 - name: "Create Xvfb deamon script"
   template:
-        src=xvfb.j2
+        src=init-xvfb.j2
         dest=/etc/init.d/xvfb
         mode=755
-
-- name: "Configure Xvfb automatic startup"
-  service:
-        name=xvfb
-        enabled=yes
-        state=started
 
 - name: "Configure display environment variable"
   template:
         src=profile-xvfb.sh.j2
         dest=/etc/profile.d/xvfb.sh
+
+- name: "Configure Xvfb automatic startup"
+  service:
+        name=xvfb
+        pattern=/usr/bin/Xvfb
+        enabled=yes
+        state=started
+

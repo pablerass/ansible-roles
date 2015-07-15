@@ -1,6 +1,7 @@
 XVFB=/usr/bin/Xvfb
-XVFBARGS=":1 -screen {{ xvfb_display }} 1024x768x24 -ac +extension GLX +render -noreset"
+XVFBARGS="{{ xvfb_display }} -screen 0 1024x768x24 -ac +extension GLX +render -noreset"
 PIDFILE=/var/run/xvfb.pid
+
 case "$1" in
   start)
     echo -n "Starting virtual X frame buffer: Xvfb"
@@ -17,8 +18,8 @@ case "$1" in
     $0 start
     ;;
   *)
-        echo "Usage: /etc/init.d/xvfb {start|stop|restart}"
-        exit 1
+    echo "Usage: /etc/init.d/xvfb {start|stop|restart}"
+    exit 1
 esac
  
 exit 0
