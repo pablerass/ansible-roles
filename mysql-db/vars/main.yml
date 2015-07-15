@@ -1,2 +1,5 @@
 ---
 # vars file for mysql-db
+db_encoding: "utf8"
+db_initial_sql_dir: "/opt"
+

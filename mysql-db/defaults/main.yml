@@ -1,2 +1,4 @@
 ---
 # defaults file for mysql-db
+mysql_root_pass: ""
+db_initial_sql: ""

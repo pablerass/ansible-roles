@@ -1,0 +1,47 @@
+---
+# tasks file for mysql-server
+- name: "Update APT chache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+
+- name: "Install MySQL server packages"
+  apt:  name=mysql-server
+        state=present
+  register: mysql_install
+
+- name: "Install other MySQL needed packages"
+  apt:  name={{ item }}
+        state=present
+  with_items:
+    - python-mysqldb
+
+# Configure root authentication
+- name: "Configure root authentication"
+  mysql_user:
+        name=root
+        host=localhost
+        password={{ mysql_root_pass }}
+  when: mysql_install.changed
+
+- name: "Configure root authentication file"
+  template:
+        src=root-my.cnf.j2
+        dest=/root/.my.cnf
+        owner=root
+        group=root
+        mode=0600
+  when: not not mysql_root_pass
+
+- name: "Delete root authentication file"
+  file: dest=/root/.my.cnf
+        state=absent
+  when: not mysql_root_pass
+
+# Clean default installation
+- name: "Remove test database"
+  mysql_db:
+        name=test
+        login_user=root
+        login_password={{ mysql_root_pass }}
+        state=absent
+

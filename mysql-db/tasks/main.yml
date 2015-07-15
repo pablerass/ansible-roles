@@ -3,11 +3,41 @@
 - name: "Create {{ db_name }} database"
   mysql_db:
         name={{ db_name }}
-        state=present
+        encoding={{ db_encoding }}
+        target={{ db_initial_sql_dir }}/{{ db_initial_sql }}
+        login_user=root
+        login_password={{ mysql_root_pass }}
+  register: new_database
 
 - name: "Create {{ db_user }} user for {{ db_name }}"
   mysql_user:
         name={{ db_user }}
         password={{ db_pass }}
         priv={{ db_name }}.*:ALL
-        state=present
+        login_user=root
+        login_password={{ mysql_root_pass }}
+
+# Import initial database
+- name: "Copy initial SQL content to database"
+  copy: src={{ db_initial_sql }}
+        dest={{ db_initial_sql_dir }}
+        mode=600
+  when: not not db_initial_sql and
+        new_database.changed
+
+- name: "Import {{ db_name }} database"
+  mysql_db:
+        name={{ db_name }}
+        target={{ db_initial_sql_dir }}/{{ db_initial_sql }}
+        login_user=root
+        login_password={{ mysql_root_pass }}
+        state=import
+  when: not not db_initial_sql and
+        new_database.changed
+
+- name: "Delete initial SQL content"
+  file: path={{ db_initial_sql_dir }}/{{ db_initial_sql }}
+        state=absent
+  when: not not db_initial_sql and
+        new_database.changed
+
