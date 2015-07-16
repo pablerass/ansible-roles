@@ -26,8 +26,8 @@
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf
         insertbefore='^local\s+all\s+all\s+peer\s*$'
-        regexp='local\s+all\s+{{ db_user }}\s+'
-        line='local all {{ db_user }} md5'
+        regexp='local\s+{{ db_name }}\s+{{ db_user }}\s+'
+        line='local {{ db_name }} {{ db_user }} md5'
   notify:
     - reload postgres
 
@@ -45,7 +45,7 @@
   lineinfile:
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf
-        line='host all {{ db_user }} {{ remote_clients }} md5'
+        line='host {{ db_name}} {{ db_user }} {{ remote_clients }} md5'
   when: pg_remote_clients is defined
   notify:
     - reload postgres
