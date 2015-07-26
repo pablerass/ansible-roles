@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: pablerass
+  description:
+  license: BSD
+  min_ansible_version: 1.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  categories:
+  - monitoring
+  - networking
+  - packaging
+  - system
+dependencies:
+  - { role: common-system }
+  - { role: common-network }
+  - { role: common-time }
+  - { role: common-packages }
+  - { role: common-monitor }
+  - { role: common-users }

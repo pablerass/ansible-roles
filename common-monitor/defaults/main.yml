@@ -1,0 +1,4 @@
+---
+# defaults file for common-monitor
+nrpe_servers:
+  - "127.0.0.1"

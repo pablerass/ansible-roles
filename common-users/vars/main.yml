@@ -1,0 +1,6 @@
+---
+# vars file for common-users
+admins_group: "admins"
+admins_sudoers_file: "/etc/sudoers.d/{{ admins_group }}"
+
+default_shell: "/bin/bash"

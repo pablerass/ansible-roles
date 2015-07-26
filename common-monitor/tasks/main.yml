@@ -1,0 +1,38 @@
+---
+# tasks file for common-monitor
+- name: "Update APT cache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+  when: ansible_os_family == 'Debian'
+
+- name: "Install NRPE client"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - nagios-nrpe-server
+  when: ansible_os_family == 'Debian'
+
+- name: "Set NRPE configuration template"
+  template:
+        src={{ item.template }}.j2
+        dest={{ nrpe_config_dir }}/{{ item.template }}
+        owner=root
+        group=root
+        mode=644
+        force="{{item.force}}"
+  with_items:
+    - { template: nrpe.cfg, force: yes }
+    - { template: nrpe_local.cfg, force: no }
+  notify:
+    - restart nagios-nrpe-server
+
+- name: "Copy NRPE configuration files"
+  copy: src={{ item.file }}
+        dest={{ nrpe_config_dir }}/nrpe.d/{{ item.file }}
+        owner=root
+        group=root
+        mode=644
+  with_items:
+    - { file: default.cfg, force: yes }
+  notify:
+    - restart nagios-nrpe-server

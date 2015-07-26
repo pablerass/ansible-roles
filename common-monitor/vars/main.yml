@@ -1,0 +1,4 @@
+---
+# vars file for common-monitor
+nrpe_config_dir: "/etc/nagios"
+

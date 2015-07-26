@@ -1,0 +1,25 @@
+---
+# tasks file for common-users
+- name: "Create {{ admins_group }} group"
+  group:
+        name={{ admins_group }}
+
+- name: "Set {{ admins_group }} sudo configuration"
+  template:
+        src=sudo_admins.j2
+        dest={{ admins_sudoers_file }}
+        mode=440
+        validate='visudo -cf %s'
+
+- name: "Create default users"
+  user: name={{ item.name }}
+        group={{ item.group }}
+        shell={{ default_shell }}
+  with_items: default_users
+
+- name: "Set SSH key authentication for default users"
+  authorized_key:
+        user={{ item.name }}
+        key="{{ lookup('file', 'id_rsa.' + item.name + '.pub') }}"
+        exclusive=yes
+  with_items: default_users

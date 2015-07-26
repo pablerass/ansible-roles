@@ -1,0 +1,77 @@
+---
+# tasks file for network-configuration
+- name: "Set default computer network parameters"
+  set_fact:
+    default_iface: "{{ ansible_default_ipv4.interface }}"
+
+- name: "Set default hostname if not specified"
+  set_fact:
+    hostname: "{{ inventory_hostname }}"
+  when: not hostname is defined
+
+- name: "Configure hostname"
+  hostname: name={{ hostname }}
+
+- name: "Set hostname in hosts"
+  lineinfile:
+        dest=/etc/hosts
+        regexp="^127\.0\.0\.1.* localhost"
+        line="127.0.0.1 {{ hostname }} localhost"
+        backup=yes
+
+- name: "Configure DNS servers"
+  lineinfile:
+        dest=/etc/dhcp/dhclient.conf
+        regexp="^prepend domain-name-servers"
+        insertafter="'#prepend domain-name-servers"
+        line="prepend domain-name-servers {{ dns_servers|join(' ') }};"
+        backup=yes
+  when: ansible_os_family == "Debian" and
+        ansible_distribution_release == "trusty" and
+        dns_servers is defined
+  register: dns_config
+
+- name: "Set default gateway"
+  lineinfile:
+        dest=/etc/network/interfaces.d/{{ default_iface }}.cfg
+        regexp="{{ item.regexp }}"
+        insertafter="EOF"
+        line="{{ item.line }}"
+        backup=yes
+  with_items:
+    - { regexp: '^post-up route del default dev', line: 'post-up route del default dev {{ default_iface }}' }
+    - { regexp: '^post-up route add default gw', line: 'post-up route add default gw {{ default_gw }}' }
+  when: ansible_os_family == "Debian" and ansible_distribution_release == "trusty" and
+        default_gw is defined and "gw" not in group_names
+  register: default_gw_config
+
+- name: "Reload network configuration"
+  shell:
+        ifdown {{ default_iface }} && ifup {{ default_iface }}
+  when: dns_config.changed or default_gw_config.changed
+
+- name: "Set hosts file content"
+  lineinfile:
+        dest=/etc/hosts
+        line='{{ item.ip }} {{ item.host }}'
+  with_items: host_list
+  when: host_list is defined
+
+- name: "Configure proxy environment variables"
+  lineinfile:
+        dest=/etc/environment
+        regexp="{{ item.regexp }}"
+        line="{{ item.line }}"
+        backup=yes
+  with_items:
+    - { regexp: '^http_proxy=', line: 'http_proxy={{ proxy_url }}' }
+    - { regexp: '^https_proxy=', line: 'https_proxy={{ proxy_url }}' }
+    - { regexp: '^ftp_proxy=', line: 'ftp_proxy={{ proxy_url }}' }
+    - { regexp: '^no_proxy=', line: 'no_proxy={{ no_proxy }}' }
+  when: proxy_url is defined
+
+- name: "Configure proxy for Apt"
+  template:
+        src=apt.conf.01proxy.j2
+        dest=/etc/apt/apt.conf.d/01proxy
+  when: proxy_url is defined

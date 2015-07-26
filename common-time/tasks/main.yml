@@ -1,0 +1,56 @@
+---
+# tasks file for common-time
+- name: "Change timezone configuration file"
+  template:
+        src=timezone.j2
+        dest=/etc/timezone
+  register: timezone_file
+
+- name: "Update timezone configuration"
+  command:
+        dpkg-reconfigure --frontend noninteractive tzdata
+  when: timezone_file.changed and
+        ansible_os_family == "Debian"
+  notify: restart cron
+
+# This is a "chapuza" to make this role idempotent
+- name: "Rechange timezone configuration file"
+  template:
+        src=timezone.j2
+        dest=/etc/timezone
+  when: timezone_file.changed
+
+# Install and configure ntp client
+- name: "Update APT cache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+  when: ntp_servers is defined
+
+- name: "Install Ntp packages"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - ntp
+  when: ntp_servers is defined
+
+# Configure ntp server
+- name: "Delete default servers"
+  lineinfile:
+        dest=/etc/ntp.conf
+        regexp='^server {{ item }}'
+        state=absent
+  with_items:
+    - '.*\.ntp\.org'
+    - '.*\.ubuntu\.com'
+  when: ntp_servers is defined
+  notify:
+    - restart ntp
+
+- name: "Set own ntp servers"
+  lineinfile:
+        dest=/etc/ntp.conf
+        line='server {{ item }}'
+  with_items: ntp_servers
+  when: ntp_servers is defined
+  notify:
+    - restart ntp
