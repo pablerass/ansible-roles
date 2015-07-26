@@ -1,0 +1,11 @@
+---
+# handlers file for common-system
+- name: service ssh reload
+  service:
+        name=ssh
+        state=reloaded
+
+- name: service ssh restart
+  service:
+        name=ssh
+        state=restarted

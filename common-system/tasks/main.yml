@@ -1,0 +1,35 @@
+---
+# tasks file for common-system
+- name: "Disable SSH LC_* environment variables propagation"
+  lineinfile:
+        dest=/etc/ssh/sshd_config
+        line='AcceptEnv LANG LC_*'
+        state=absent
+  notify:
+    - service ssh restart
+
+- meta: flush_handlers
+
+- name: "Set default umask"
+  lineinfile:
+        dest=/etc/login.defs
+        regexp='^UMASK'
+        line='UMASK 077'
+
+- name: "Disable usergroups"
+  lineinfile:
+        dest=/etc/login.defs
+        regexp='^USERGROUPS_ENAB'
+        line='USERGROUPS_ENAB no'
+
+- name: "Set sudo root umask"
+  lineinfile:
+        dest=/etc/sudoers
+        insertbefore=BOF
+        line='{{item}}'
+        validate='visudo -cf %s'
+  with_items:
+    - 'Defaults        umask = 0022'
+    - 'Defaults        umask_override'
+
+
