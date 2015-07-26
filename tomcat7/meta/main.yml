@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: pablerass
+  description:
+   - BSD
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 1.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  categories:
+  - web
+dependencies:
+  - { role: oracle-jvm, version: 8, set_default: true }

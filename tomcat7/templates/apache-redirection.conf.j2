@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+	ProxyPass /{{ tomcat_context }} ajp://localhost:8081/{{ tomcat_context }}
+	ProxyPassReverse /{{ tomcat_context }} ajp://localhost:8081/{{ tomcat_context }}
+
+	ProxyPass /manager ajp://localhost:8081/manager
+	ProxyPassReverse /manager ajp://localhost:8081/manager
+
+	ErrorLog ${APACHE_LOG_DIR}/tomcat7_{{ tomcat_context }}_error.log
+	CustomLog ${APACHE_LOG_DIR}/tomcat7_{{ tomcat_context }}_access.log combined
+</VirtualHost>

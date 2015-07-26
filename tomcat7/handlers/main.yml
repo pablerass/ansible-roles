@@ -1,0 +1,13 @@
+---
+# handlers file for tomcat7
+- name: reload apache
+  service: name=apache2
+           state=reloaded
+
+- name: restart tomcat
+  service: name=tomcat7
+           state=restarted
+
+- name: reload postgres
+  service: name=postgresql
+           state=reloaded

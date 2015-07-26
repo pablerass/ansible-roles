@@ -1,0 +1,98 @@
+---
+# tasks file for tomcat7
+- name: "Update APT cache"
+  apt:  update_cache=yes
+        cache_valid_time=3600
+  when: ansible_os_family == 'Debian'
+
+- name: "Install Apache2"
+  apt:  name=apache2
+        state=present
+  when: ansible_os_family == 'Debian'
+
+- name: "Create site configuration"
+  template:
+        src=apache-redirection.conf.j2
+        dest=/etc/apache2/sites-available/tomcat-{{ tomcat_context }}.conf
+  notify:
+    - reload apache
+
+- name: "Disable default site"
+  file: path=/etc/apache2/sites-enabled/000-default.conf
+        state=absent
+  notify:
+    - reload apache
+
+- name: "Enable Apache2 Proxy module"
+  apache2_module:
+        name=proxy_ajp
+        state=present
+  when: ansible_os_family == 'Debian'
+  notify:
+    - reload apache
+
+- name: "Enable new site"
+  file: src=/etc/apache2/sites-available/tomcat-{{ tomcat_context }}.conf
+        dest=/etc/apache2/sites-enabled/tomcat-{{ tomcat_context }}.conf
+        state=link
+  notify:
+    - reload apache
+
+- name: "Install Tomcat7"
+  apt: name={{ item }}
+       state=present
+  with_items:
+    - tomcat7
+    - tomcat7-admin
+  when: ansible_os_family == 'Debian'
+
+- name: "Configure Java Tomcat environment variables"
+  lineinfile:
+        dest=/etc/default/tomcat7
+        regexp='^#?JAVA_HOME='
+        line=JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+- name: "Replace HTTP connector with AJP"
+  lineinfile:
+        backup=yes
+        dest=/etc/tomcat7/server.xml
+        regexp='^\s*<Connector port="808'
+        line='    <Connector port="8081" protocol="AJP/1.3"'
+  notify:
+    - restart tomcat
+
+- name: "Configure Tomcat manager users"
+  template:
+        dest=/etc/tomcat7/tomcat-users.xml 
+        src=tomcat-users.xml.j2
+  notify:
+    - restart tomcat
+
+- name: "Enable Tomcat debug port"
+  lineinfile:
+        dest=/etc/default/tomcat7
+        regexp='^#?JAVA_OPTS=.* -Xdebug -Xrunjdwp'
+        line='JAVA_OPTS="${JAVA_OPTS} -Xdebug -Xrunjdwp:transport=dt_socket,address={{ tomcat_debug_port }},server=y,suspend=n"'
+  when: tomcat_enable_debug
+  notify:
+    - restart tomcat
+
+- name: "Disable Tomcat debug port"
+  lineinfile:
+        dest=/etc/default/tomcat7
+        regexp='^#?JAVA_OPTS=.* -Xdebug -Xrunjdwp'
+        line='#JAVA_OPTS="${JAVA_OPTS} -Xdebug -Xrunjdwp:transport=dt_socket,address={{ tomcat_debug_port }},server=y,suspend=n"'
+  when: not tomcat_enable_debug
+  notify:
+    - restart tomcat
+
+- name: "Set Spring profile"
+  lineinfile:
+        backup=yes
+        dest=/etc/tomcat7/catalina.properties
+        regexp='^spring\.profiles\.active='
+        line='spring.profiles.active={{spring_profile}}'
+  when: spring_profile is defined
+  notify:
+    - restart tomcat
+

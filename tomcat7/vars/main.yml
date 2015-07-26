@@ -1,0 +1,6 @@
+---
+# vars file for tomcat7
+tomcat_context: ""
+
+tomcat_enable_debug: false
+tomcat_debug_port: 8000
