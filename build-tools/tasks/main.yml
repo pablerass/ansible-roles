@@ -1,0 +1,101 @@
+---
+# tasks file for build-tools
+---
+# Add needed Apt repositories
+- name: "Copy repository files"
+  copy: src={{ item }}
+        dest=/etc/apt/sources.list.d
+  with_fileglob:
+    - apt-sources/*
+  register: apt_sources
+
+#- name: "Add Apt keys"
+#  apt_key:
+#        url={{ item }}
+#  with_items:
+#    - 'https://deb.nodesource.com/gpgkey/nodesource.gpg.key'
+
+- name: "Update APT cache"
+  apt:  update_cache=yes
+  when: ansible_os_family == 'Debian' and
+        apt_sources.changed
+
+# Install packages
+- name: "Install general packages"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - 'daemon'
+    - 'curl'
+    - 'unzip'
+
+- name: "Intall build tools"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - 'ant'
+    - 'build-essential'
+    - 'gradle'
+    - 'maven'
+
+  when: ansible_os_family == 'Debian'
+- name: "Install Ruby packages"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - 'ruby2.0=2.0.0.484-1ubuntu2.2'
+    - 'ruby2.0-dev=2.0.0.484-1ubuntu2.2'
+    - 'zlib1g-dev'
+  when: ansible_os_family == 'Debian'
+
+# This is needed due to a Ubuntu 14.04 ruby 2.0 package issue
+- name: "Correct Ruby links"
+  file: src={{ item.src }}
+        dest={{ item.dest }}
+        state=link
+  with_items:
+    - { src: "/usr/bin/ruby2.0", dest: "/usr/bin/ruby" }
+    - { src: "/usr/bin/gem2.0", dest: "/usr/bin/gem" }
+    - { src: "/usr/bin/irb2.0", dest: "/usr/bin/irb" }
+    - { src: "/usr/bin/rdoc2.0", dest: "/usr/bin/rdoc" }
+    - { src: "/usr/bin/erb2.0", dest: "/usr/bin/erb" }
+
+- name: "Install Ruby gems"
+  gem:  name={{ item.name }}
+        version={{ item.version }}
+        user_install=no
+        # TODO: Decide wether to do this or to install with the bamboo user.
+  with_items:
+    - { name: 'apiary', version: '' }
+    - { name: 'bundler', version: '1.8.3' }
+    - { name: 'calabash-android', version: '0.5.10' }
+    - { name: 'calabash-cucumber', version: '' } # For native iOS apps testing
+    - { name: 'calabash-screenshot', version: '' }
+    - { name: 'capybara', version: '' }
+    - { name: 'cucumber', version: '1.3.19' }
+    - { name: 'rake', version: '10.4.2' }
+    - { name: 'selenium-webdriver', version: '' }
+
+- name: "Install Nodejs packages"
+  apt:  name={{ item }}
+        state=installed
+  with_items:
+    - 'nodejs'
+    - 'npm'
+  when: ansible_os_family == 'Debian'
+
+- name: "Create standard NodeJS link"
+  file: src=/usr/bin/nodejs
+        dest=/usr/bin/node
+        state=link
+
+- name: "Install Nodejs modules"
+  npm:  name={{ item.name }}
+        version={{ item.version }}
+        global=yes
+        # TODO: Decide wether to do this or to install with the bamboo user.
+  with_items:
+    - { name: 'grunt-cli', version: '0.1.13' }
+    - { name: 'gulp', version: '' }
+    - { name: 'httpserver', version: '' }
+    - { name: 'npm', version: '2.10' }
