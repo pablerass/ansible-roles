@@ -45,3 +45,10 @@
         login_password={{ mysql_root_pass }}
         state=absent
 
+# Copy additional scripts
+- name: "Copy backup script"
+  copy: src=backup-mysql-db.sh
+        dest=/usr/local/bin/backup-mysql-db.sh
+        owner=root
+        group=root
+        mode=755
