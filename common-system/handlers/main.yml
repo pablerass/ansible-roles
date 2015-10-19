@@ -5,7 +5,3 @@
         name=ssh
         state=reloaded
 
-- name: service ssh restart
-  service:
-        name=ssh
-        state=restarted

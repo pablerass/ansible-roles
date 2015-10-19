@@ -12,4 +12,5 @@
     - zip
     - curl
     - git
+    - htop
   when: ansible_os_family == 'Debian'

@@ -2,15 +2,14 @@
 galaxy_info:
   author: pablerass
   description: 
-  - BSD
+  license: GPLv3
+  min_ansible_version: 1.9
   platforms:
   - name: Ubuntu
     versions:
-    - all
-  - name: Debian
-    versions:
-    - all
+    - trusty
   categories:
   - development
   - system
 dependencies: []
+  

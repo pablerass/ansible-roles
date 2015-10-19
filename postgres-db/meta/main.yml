@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  author: bleras
+  author: pablerass
   description:
-  license: license CC-BY
-  min_ansible_version: 1.2
+  license: GPLv3
+  min_ansible_version: 1.9
   platforms:
     - name: Ubuntu
       versions:
@@ -12,3 +12,4 @@ galaxy_info:
     - database:sql
 dependencies:
   - { role: postgres }
+  

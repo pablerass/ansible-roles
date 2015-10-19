@@ -2,9 +2,8 @@
 galaxy_info:
   author: pablerass
   description:
-   - BSD
-  license: license (GPLv2, CC-BY, etc)
-  min_ansible_version: 1.2
+  license: GPLv3
+  min_ansible_version: 1.9
   platforms:
   - name: Ubuntu
     versions:
@@ -13,3 +12,4 @@ galaxy_info:
   - web
 dependencies:
   - { role: oracle-jvm, version: 8, set_default: true }
+  

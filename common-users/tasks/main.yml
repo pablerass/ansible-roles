@@ -15,11 +15,22 @@
   user: name={{ item.name }}
         group={{ item.group }}
         shell={{ default_shell }}
-  with_items: default_users
+        comment="{{ item.full_name}}"
+  with_items: current_users
+  when: current_users is defined
 
 - name: "Set SSH key authentication for default users"
   authorized_key:
         user={{ item.name }}
-        key="{{ lookup('file', 'id_rsa.' + item.name + '.pub') }}"
+        key="{{ lookup('file', 'keys/id_rsa.' + item.name + '.pub')}}"
         exclusive=yes
-  with_items: default_users
+  with_items: current_users
+  when: current_users is defined
+
+- name: "Delete users"
+  user: name={{ item.name }}
+        state=absent
+        remove=yes
+  with_items: deleted_users
+  when: deleted_users is defined
+

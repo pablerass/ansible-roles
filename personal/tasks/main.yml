@@ -1,0 +1,71 @@
+---
+# tasks file for personal
+- name: "Install packages"
+  become: yes
+  apt:  package={{ item }}
+  with_items:
+    - zsh
+    - tmux
+    - vim
+    - git
+    - curl
+
+- name: "Checkout dotfiles repository"
+  git:  repo=https://github.com/pablerass/dotfiles.git
+        dest={{ personal_home }}/dotfiles
+
+- name: "Checkout oh-my-zsh"
+  git:  repo=https://github.com/robbyrussell/oh-my-zsh.git
+        dest={{ personal_home }}/.oh-my-zsh
+
+- name: "oh-my-zsh plugins"
+  git:  repo={{ item.repo }}
+        dest={{ personal_home }}/.oh-my-zsh/custom/plugins/{{ item.dir }}
+  with_items:
+    - { repo: "https://github.com/jplitza/zsh-virsh-autocomplete.git", dir: "virsh" }
+
+- name: "Dotfiles configuration"
+  file: src={{ personal_home }}/dotfiles/{{ item }}
+        dest={{ personal_home }}/.{{ item }}
+        state=link
+  with_items:
+    - gitconfig
+    - zshrc
+    - tmux.conf
+    - vimrc
+
+- name: "Scripts directory"
+  file: src={{ personal_home }}/dotfiles/bin
+        dest={{ personal_home }}/bin
+        state=link
+
+- name: "Vim configuration directories"
+  file: path={{ personal_home }}/.vim/{{ item }}
+        state=directory
+  with_items:
+    - autoload
+    - bundle
+    - swaps
+    - backups
+    - undos
+    - spell
+
+- name: "Vim pathogen for bundles"
+  command: curl -Sso {{ personal_home }}/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+  args:
+    creates: "{{ personal_home }}/.vim/autoload/pathogen.vim"
+
+- name: "Vim bundles"
+  git:  repo={{ item.repo }}
+        dest={{ personal_home }}/.vim/bundle/{{ item.dir }}
+  with_items:
+    - { repo: "https://github.com/scrooloose/nerdtree.git", dir: "nerdtree" }
+    - { repo: "https://github.com/bling/vim-airline.git", dir: "vim-airline" }
+    - { repo: "https://github.com/tpope/vim-fugitive.git", dir: "vim-fugitive" }
+    #- { repo: "https://github.com/davidhalter/jedi-vim.git", dir: "jedi-vim" }
+    #- { repo: "https://github.com/nvie/vim-flake8.git", dir: "vim-flake8" }
+
+- name: "zsh as default shell"
+  become: yes
+  user: name={{ personal_user }}
+        shell=/bin/zsh

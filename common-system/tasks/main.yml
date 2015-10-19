@@ -6,7 +6,7 @@
         line='AcceptEnv LANG LC_*'
         state=absent
   notify:
-    - service ssh restart
+    - service ssh reload
 
 - meta: flush_handlers
 
@@ -31,5 +31,4 @@
   with_items:
     - 'Defaults        umask = 0022'
     - 'Defaults        umask_override'
-
 
