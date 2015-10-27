@@ -1,0 +1,14 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  hosts: all
+  name: ansible_playbook
+  ansible_version: 1.9.3
+
+platforms:
+  - name: ubuntu/trusty64
+
+suites:
+  - name: default
