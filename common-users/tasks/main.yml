@@ -14,7 +14,7 @@
 - name: "Create default users"
   user: name={{ item.name }}
         group={{ item.group }}
-        shell={{ default_shell }}
+        {% if item.shell is defined %}shell={{ item.shell }}{% else %}shell={{ default_shell }}{% endif %}
         comment="{{ item.full_name}}"
   with_items: current_users
   when: current_users is defined

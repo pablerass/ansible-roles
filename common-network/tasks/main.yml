@@ -41,8 +41,10 @@
   with_items:
     - { regexp: '^post-up route del default dev', line: 'post-up route del default dev {{ default_iface }}' }
     - { regexp: '^post-up route add default gw', line: 'post-up route add default gw {{ default_gw }}' }
-  when: ansible_os_family == "Debian" and ansible_distribution_release == "trusty" and
-        default_gw is defined and "gw" not in group_names
+  when: ansible_os_family == "Debian" and
+        ansible_distribution_release == "trusty" and
+        default_gw is defined and
+        "gw" not in group_names
   register: default_gw_config
 
 - name: "Reload network configuration"

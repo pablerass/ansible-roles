@@ -4,11 +4,7 @@
   become: yes
   apt:  package={{ item }}
   with_items:
-    - zsh
     - tmux
-    - vim
-    - git
-    - curl
 
 - name: "Checkout dotfiles repository"
   git:  repo=https://github.com/pablerass/dotfiles.git
@@ -60,7 +56,8 @@
         dest={{ personal_home }}/.vim/bundle/{{ item.dir }}
   with_items:
     - { repo: "https://github.com/scrooloose/nerdtree.git", dir: "nerdtree" }
-    - { repo: "https://github.com/bling/vim-airline.git", dir: "vim-airline" }
+    - { repo: "https://github.com/vim-airline/vim-airline.git", dir: "vim-airline" }
+    - { repo: "https://github.com/vim-airline/vim-airline-themes.git", dir: "vim-airline-themes" }
     - { repo: "https://github.com/tpope/vim-fugitive.git", dir: "vim-fugitive" }
     #- { repo: "https://github.com/davidhalter/jedi-vim.git", dir: "jedi-vim" }
     #- { repo: "https://github.com/nvie/vim-flake8.git", dir: "vim-flake8" }

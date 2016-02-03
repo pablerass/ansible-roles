@@ -15,4 +15,5 @@
     - git
     - htop
     - sysstat
+    - vim
   when: ansible_os_family == 'Debian'
