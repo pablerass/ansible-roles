@@ -11,6 +11,8 @@
   with_items:
     - zip
     - curl
+    - wget
     - git
     - htop
+    - sysstat
   when: ansible_os_family == 'Debian'
