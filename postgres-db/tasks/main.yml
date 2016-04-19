@@ -1,11 +1,11 @@
 ---
 - name: "Create {{ db_name }} database"
-  sudo_user: postgres
+  become_user: postgres
   postgresql_db:
         name={{ db_name }}
 
 - name: "Create {{ db_user }} user for {{ db_name }}"
-  sudo_user: postgres
+  become_user: postgres
   postgresql_user:
         db={{ db_name }}
         name={{ db_user }}
@@ -13,7 +13,7 @@
         priv=CONNECT
 
 - name: "Set default {{ db_user }} privileges"
-  sudo_user: postgres
+  become_user: postgres
   postgresql_privs:
         database={{ db_name }}
         state=present
@@ -37,15 +37,15 @@
         dest=/etc/postgresql/9.3/main/postgresql.conf
         regexp='^#?listen_addresses ='
         line="listen_addresses = '*'"
-  when: pg_remote_clients is defined
+  when: db_remote_clients is defined
   notify:
     - restart postgres
 
-- name: "Configure {{ db_user }} remote authentication from {{ remote_clients }} hosts"
+- name: "Configure {{ db_user }} remote authentication from {{ db_remote_clients }} hosts"
   lineinfile:
         backup=yes
         dest=/etc/postgresql/9.3/main/pg_hba.conf
-        line='host {{ db_name}} {{ db_user }} {{ remote_clients }} md5'
-  when: pg_remote_clients is defined
+        line='host {{ db_name}} {{ db_user }} {{ db_remote_clients }} md5'
+  when: db_remote_clients is defined
   notify:
     - reload postgres
