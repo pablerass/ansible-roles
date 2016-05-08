@@ -1,0 +1,23 @@
+---
+# tasks file for jenkins
+- name: "Add Jenkins Apt key"
+  apt_key:
+        url=https://jenkins-ci.org/debian/jenkins-ci.org.key
+
+- name: "Add Jenkins repository"
+  apt_repository:
+        repo='deb http://pkg.jenkins-ci.org/debian binary/'
+
+- name: "Install Jenkins dependencies"
+  apt:  name={{ item }}
+  with_items:
+    - 'openjdk-7-jre'
+    - 'openjdk-7-jdk'
+
+- name: "Install Jenkins"
+  apt:  name=jenkins
+
+- name: "Start Jenkins service"
+  service:
+        name=jenkins
+        state=started
