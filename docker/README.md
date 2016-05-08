@@ -4,7 +4,7 @@ Install Docker and add initial images.
 
 ## Role Variables
 
-* `docker_user`
+* `docker_users`
 * `docker_images`
 * `docker_engine_version`
 * `docker_compose_version`
