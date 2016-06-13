@@ -94,13 +94,13 @@
 
 - name: "Update common Android SDK components"
   shell: '{{ android_sdk_update_sh }} --filter {{ item }} >> {{ android_sdk_home }}/android-sdk-update-{{ item }}.log'
-  with_items: android_tools.all
+  with_items: '{{android_tools.all}}'
 
 # TODO: Review if --all is necessary because installs system images every time
 # this task is executed.
 - name: "Update specific Android SDK components"
   shell: '{{ android_sdk_update_sh }} --all --filter {{ item }} >> {{ android_sdk_home }}/android-sdk-update-{{ item }}.log'
-  with_items: android_tools[android_sdk_mode]
+  with_items: '{{android_tools[android_sdk_mode]}}'
   when: android_sdk_mode == "emulator" or
         android_sdk_mode == "compiler"
 
