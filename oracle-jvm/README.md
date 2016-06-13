@@ -4,14 +4,16 @@ Installs specified version of Oracle Java Virtual Machine.
 
 ## Role Variables
 
-* `version` - The version to install. By default is _8_.
-* `set_default` - If must be set as default.
+* `oracle_jvm_versions` - The versions to install. By default is _8_.
+* `oracle_jvm_default_version` - The default version if multiple ones are
+  installed.
 
 ## Example Playbook
 
     - hosts: servers
       roles:
-         - { role: oracle-jvm, version: 7, set_default: true }
+         - { role: oracle-jvm, oracle_jvm_versions: [ 7, 8 ],
+                               oracle_jvm_default_version: 7 }
 
 ## License
 

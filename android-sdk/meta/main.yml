@@ -11,5 +11,4 @@ galaxy_info:
   categories:
   - development
 dependencies:
-  - { role: oracle-jvm, version: 8 }
-  
+  - { role: oracle-jvm, oracle_jvm_version: 8 }
