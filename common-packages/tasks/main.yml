@@ -1,5 +1,17 @@
 ---
 # tasks file for common-packages
+- name: "Disable automatic package list update"
+  lineinfile:
+        name=/etc/apt/apt.conf.d/10periodic
+        regexp='^APT::Periodic::Update-Package-List'
+        line='APT::Periodic::Update-Package-Lists "0";'
+  when: ansible_os_family == 'Debian'
+
+- name: "Ensure that dpkg is clean"
+  command: dpkg --configure -a
+  changed_when: false
+  when: ansible_os_family == 'Debian'
+
 - name: "Update APT cache"
   apt:  update_cache=yes
         cache_valid_time=3600
@@ -9,11 +21,17 @@
   apt:  name={{ item }}
         state=installed
   with_items:
+    - vim
     - zip
     - curl
     - wget
+    - jq
     - git
     - htop
     - sysstat
-    - vim
+    - iotop
+    - lvm2
+    - xfsprogs
+    - python-pip
+    - python3-pip
   when: ansible_os_family == 'Debian'
