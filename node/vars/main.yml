@@ -1,0 +1,8 @@
+---
+# vars file for node
+node_available_versions:
+  - '0.10'
+  - '0.12'
+  - '4.x'
+  - '5.x'
+  - '6.x'
