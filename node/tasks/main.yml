@@ -1,7 +1,7 @@
 ---
 # tasks file for node
 - name: "Check node version"
-  fail: "Version {{ node_version }} not in {{ node_available_versions }}"
+  fail: msg="Version {{node_version}} not in {{node_available_versions}}"
   when: node_version not in node_available_versions
 
 - name: "Add node key"

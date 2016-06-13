@@ -21,7 +21,7 @@
 
 # TODO: Fix this to make it work
 #- name: "Check Oracle JVM default version"
-#  fail: "Version {{ oracle_jvm_default_version }} not in {{ oracle_jvm_versions }}"
+#  fail: msg="Version {{ oracle_jvm_default_version }} not in {{ oracle_jvm_versions }}"
 #  when: oracle_jvm_default_version is defined and
 #        oracle_java_default_version not in oracle_jvm_versions
 
