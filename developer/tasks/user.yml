@@ -1,0 +1,57 @@
+---
+# tasks file for developer
+
+# Python configuration
+- name: "user .pypirc file"
+  template:
+        src=pypirc.j2
+        dest='~/.pypirc'
+        mode=0600
+
+- name: "user .pip dir"
+  file: path='~/.pip'
+        state=directory
+
+- name: "user .pip/pip.conf file"
+  template:
+        src=pip.conf.j2
+        dest='~/.pip/pip.conf'
+        mode=0600
+
+# Ruby configuration
+- name: "user .bundle"
+  file: path='~/.bundle'
+        state=directory
+
+- name: "user .bundle/config file"
+  template:
+        src=bundle.config.j2
+        dest='~/.bundle/config'
+        mode=0600
+
+- name: "user .gemrc file"
+  template:
+        src=gemrc.j2
+        dest='~/.gemrc'
+        mode=0600
+
+# Maven configuration
+- name: "user .m2 settings.xml"
+  file: src=m2.settings.xml.j2
+        dest='~/.m2/settings.xml'
+        mode=0660
+
+# Node configuration
+- name: "user .npmrc file"
+  template:
+        src=npmrc.j2
+        dest='~/.npmrc'
+        mode=0600
+
+# Bower configuration
+- name: "user .bowerrc file"
+  template:
+        src=bowerrc.j2
+        dest='~/.bowerrc'
+        mode=0600
+

@@ -1,0 +1,27 @@
+---
+# tasks file for developer
+
+# Python configuration
+- name: "root .pip dir"
+  file: path='/root/.pip'
+        state=directory
+
+- name: "root .pip/pip.conf file"
+  template:
+        src=pip.conf.j2
+        dest='/root/.pip/pip.conf'
+        mode=0600
+
+- name: "root .gemrc file"
+  template:
+        src=gemrc.j2
+        dest='/root/.gemrc'
+        mode=0600
+
+# APT configuration
+#- name: "global apt artifactory.list file"
+#  template:
+#        src=apt.artifactory.list.j2
+#        dest='/etc/apt/sources.list/artifactory.list'
+#        mode=0600
+

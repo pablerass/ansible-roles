@@ -1,0 +1,5 @@
+registry={{ repo_url }}/api/npm/npm
+_auth = {{ [ user_name, user_pass ]|join(':')|b64encode }}
+always-auth = true
+email = {{ user_mail }}
+loglevel = warn

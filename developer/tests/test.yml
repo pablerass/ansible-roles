@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  remote_user: root
+  vars:
+    - user_name: test
+    - user_pass: test
+    - user_mail: test@test.te
+    - repo_domain: test.test
+  roles:
+    - { role: developer }

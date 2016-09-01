@@ -1,0 +1,4 @@
+---
+# vars file for developer
+repo_url: "https://{{ repo_domain }}/artifactory"
+repo_auth_url: "https://{{ user_name }}:{{ user_pass }}@{{ repo_domain }}/artifactory"
