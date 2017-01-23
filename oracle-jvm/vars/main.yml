@@ -1,6 +1,0 @@
----
-# vars file for oracle-jvm
-oracle_jvm_versions: 8
-
-webupd8_apt_key: "EEA14886"
-webupd8_ppa: "ppa:webupd8team/java"
