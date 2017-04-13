@@ -1,6 +1,0 @@
----
-# vars file for docker
-docker_engine_version: "1.10.3"
-docker_compose_version: "1.6.2"
-docker_users: []
-docker_images: []
